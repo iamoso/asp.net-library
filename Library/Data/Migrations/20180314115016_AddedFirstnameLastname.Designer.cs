@@ -11,9 +11,10 @@ using System;
 namespace Library.Data.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180314115016_AddedFirstnameLastname")]
+    partial class AddedFirstnameLastname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +36,9 @@ namespace Library.Data.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("Firstname");
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("Lastname");
 
                     b.Property<bool>("LockoutEnabled");
 

@@ -11,9 +11,10 @@ using System;
 namespace Library.Data.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180314115231_AddedFirstNameLastNameCorrection")]
+    partial class AddedFirstNameLastNameCorrection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
