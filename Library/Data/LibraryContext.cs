@@ -8,12 +8,14 @@ using Library.Models;
 
 namespace Library.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class LibraryContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public LibraryContext(DbContextOptions<LibraryContext> options)
             : base(options)
         {
         }
+
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
