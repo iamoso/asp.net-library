@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Library.Models.UsersViewModels.UsersViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    @*<a asp-action="Create">Create New</a>*@
+</p>
+<table class="table">
+    <thead>
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.ApplicationUser.FirstName)</th>
+        <th>@Html.DisplayNameFor(model => model.ApplicationUser.LastName)</th>
+        <th>@Html.DisplayNameFor(model => model.ApplicationUser.Email)</th>
+        <th>@Html.DisplayNameFor(model => model.ApplicationUser.PhoneNumber)</th>
+        <th>@Html.DisplayNameFor(model => model.Roles)</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.ApplicationUser.FirstName)</td>
+        <td>@Html.DisplayFor(modelItem => item.ApplicationUser.LastName)</td>
+        <td>@Html.DisplayFor(modelItem => item.ApplicationUser.Email)</td>
+        <td>@Html.DisplayFor(modelItem => item.ApplicationUser.PhoneNumber)</td>
+        <td>
+            @foreach (var role in item.Roles)
+            {
+                <span>@role</span>
+            }
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ApplicationUser.Id }) |
+            @*@Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+        </td>
+    </tr>
+}
+    </tbody>
+</table>
