@@ -51,7 +51,7 @@ namespace Library
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -65,8 +65,9 @@ namespace Library
             }
 
             app.UseStaticFiles();
-
             app.UseAuthentication();
+
+            CreateRoles(serviceProvider).Wait();
 
             app.UseMvc(routes =>
             {
@@ -74,6 +75,63 @@ namespace Library
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        public async Task CreateRoles(IServiceProvider serviceProvider)
+        {
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            string[] roles = {"Administrator", "User"};
+
+            foreach (var role in roles)
+            {
+                var roleExists = await roleManager.RoleExistsAsync(role);
+                if (!roleExists)
+                {
+                    var roleResult = await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+
+            var admin = new ApplicationUser
+            {
+                UserName = "admin@adm.in",
+                Email = "admin@adm.in",
+                PhoneNumber = "123987456",
+                FirstName = "Administrator",
+                LastName = "Admin"
+            };
+            var adminPassword = "admin";
+
+            var adminExists = await userManager.FindByEmailAsync(admin.Email);
+            if (adminExists == null)
+            {
+                var adminCreate = await userManager.CreateAsync(admin, adminPassword);
+                if (adminCreate.Succeeded)
+                {
+                    await userManager.AddToRolesAsync(admin, new[] {"Administrator", "User"});
+                }
+            }
+
+
+            var user = new ApplicationUser
+            {
+                UserName = "user@us.er",
+                Email = "user@us.er",
+                PhoneNumber = "987123654",
+                FirstName = "User",
+                LastName = "Use"
+            };
+            var userPassword = "user";
+
+            var userExists = await userManager.FindByEmailAsync(user.Email);
+            if (userExists == null)
+            {
+                var userCreate = await userManager.CreateAsync(user, userPassword);
+                if (userCreate.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, "User");
+                }
+            }
         }
     }
 }
