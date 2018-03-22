@@ -7,6 +7,7 @@ using Library.Models.UsersViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Library.Controllers
 {
@@ -14,10 +15,14 @@ namespace Library.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly List<SelectListItem> _rolesList;
 
-        public UsersController(UserManager<ApplicationUser> userManager)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
+            _rolesList = _roleManager.Roles.ToList().Select(role => new SelectListItem { Text = role.Name, Value = role.Name }).ToList();
         }
 
         [HttpGet]
@@ -45,6 +50,11 @@ namespace Library.Controllers
                 return NotFound();
 
             var user = await _userManager.FindByIdAsync(id);
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            
+            //roles[0].Selected = true;
+
             var model = new UserEditViewModel()
             {
                 Id = user.Id,
@@ -55,7 +65,9 @@ namespace Library.Controllers
                 EmailConfirmed = user.EmailConfirmed,
                 PhoneNumberConfirmed = user.PhoneNumberConfirmed,
                 LockoutEnd = user.LockoutEnd,
-                TwoFactorEnabled = user.TwoFactorEnabled
+                TwoFactorEnabled = user.TwoFactorEnabled,
+                Roles = userRoles,
+                RolesToChoose = _rolesList
             };
 
             return View(model);
@@ -65,24 +77,35 @@ namespace Library.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserEditViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByIdAsync(model.Id);
+            if (!ModelState.IsValid)
+                return View();
 
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
-                user.Email = model.Email;
-                user.PhoneNumber = model.PhoneNumber;
-                user.EmailConfirmed = model.EmailConfirmed;
-                user.PhoneNumberConfirmed = model.PhoneNumberConfirmed;
-                user.LockoutEnd = model.LockoutEnd;
-                user.TwoFactorEnabled = model.TwoFactorEnabled;
+            var user = await _userManager.FindByIdAsync(model.Id);
 
-                _userManager.UpdateAsync(user).Wait();
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.EmailConfirmed = model.EmailConfirmed;
+            user.PhoneNumberConfirmed = model.PhoneNumberConfirmed;
+            user.LockoutEnd = model.LockoutEnd;
+            user.TwoFactorEnabled = model.TwoFactorEnabled;
 
-                return RedirectToAction(nameof(Index));
-            }
-            return View();
+            _userManager.UpdateAsync(user).Wait();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<string> AddRole(string id)
+        {
+            if (!ModelState.IsValid)
+                return "notValid";
+
+            //var user = await _userManager.FindByIdAsync(model.Id);
+
+            return id;
         }
     }
 }

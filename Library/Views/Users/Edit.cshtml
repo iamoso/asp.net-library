@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
@@ -52,8 +52,26 @@
                 <input asp-for="TwoFactorEnabled" placeholder="test" class="form-control" />
                 <span asp-validation-for="TwoFactorEnabled" class="text-danger"></span>
             </div>
+            
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <label asp-for="Roles" class="control-label"></label>
+                @foreach (var role in Model.Roles)
+                {
+                    <span>@role</span>
+                }
+            </div>
+
+            <div class="form-group">
+                @Html.DropDownListFor(model => model.SelectedRole, Model.RolesToChoose)
+            </div>
+
+            <div class="form-group">
+                <input type="submit" asp-action="AddRole" value="Add role" class="btn btn-default" />
+                <input type="submit" asp-action="DeleteRole" value="Delete role" class="btn btn-default" />
+            </div>
+
+            <div class="form-group">
+                <input type="submit" asp-action="Edit" value="Save" class="btn btn-default" />
             </div>
         </form>
     </div>
