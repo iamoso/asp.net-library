@@ -108,17 +108,24 @@ namespace Library.Controllers
 
             var user = await _userManager.FindByIdAsync(model.Id);
 
-            var addToRoleResult = await _userManager.AddToRoleAsync(user, model.SelectedRole);
-            if (addToRoleResult.Succeeded)
-            {
-                ViewBag.Result = "User role added succesfully.";
-            }
-            else
-            {
-                ViewBag.Result = "Something went wrong.";
-            }
+            await _userManager.AddToRoleAsync(user, model.SelectedRole);
 
             return RedirectToAction("Edit", new {id = model.Id});
+        }
+
+        [Route("Users/DeleteRole/{id}")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRole(UserEditViewModel model)
+        {
+            if(!ModelState.IsValid)
+                return View(nameof(Edit));
+
+            var user = await _userManager.FindByIdAsync(model.Id);
+
+            await _userManager.RemoveFromRoleAsync(user, model.SelectedRole);
+
+            return RedirectToAction("Edit", new { id = model.Id });
         }
     }
 }
