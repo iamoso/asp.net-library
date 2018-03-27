@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Library.Data;
-using Library.Models;
 using Library.Models.BooksViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +25,6 @@ namespace Library.Controllers
             {
                 var authors = _context.BookAuthors.Where(b => b.BookId == book.Id).ToList();
                 var bookAuthors = authors.Select(author => _context.Authors.SingleOrDefault(a => a.Id == author.AuthorId)).ToList();
-                //var count = _context.Copies.Select(c => c.Book.Id == book.Id && c.IsAvailable).ToList().Count;
                 var count = _context.Copies.Count(c => c.Book.Id == book.Id && c.IsAvailable);
 
                 model.Add(new BooksViewModel
