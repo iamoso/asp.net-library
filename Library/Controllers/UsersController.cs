@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Library.Models;
@@ -22,7 +23,7 @@ namespace Library.Controllers
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _rolesList = _roleManager.Roles.ToList().Select(role => new SelectListItem { Text = role.Name, Value = role.Name }).ToList();
+            
         }
 
         [HttpGet]
@@ -46,14 +47,15 @@ namespace Library.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
+            Debug.WriteLine("get edit");
+
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
             var user = await _userManager.FindByIdAsync(id);
 
             var userRoles = await _userManager.GetRolesAsync(user);
-            
-            //roles[0].Selected = true;
+            var rolesList = _roleManager.Roles.ToList().Select(role => new SelectListItem { Text = role.Name, Value = role.Name }).ToList();
 
             var model = new UserEditViewModel()
             {
@@ -67,7 +69,7 @@ namespace Library.Controllers
                 LockoutEnd = user.LockoutEnd,
                 TwoFactorEnabled = user.TwoFactorEnabled,
                 Roles = userRoles,
-                RolesToChoose = _rolesList
+                RolesToChoose = rolesList
             };
 
             return View(model);
@@ -96,16 +98,27 @@ namespace Library.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Route("Users/AddRole/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<string> AddRole(string id)
+        public async Task<IActionResult> AddRole(UserEditViewModel model)
         {
             if (!ModelState.IsValid)
-                return "notValid";
+                return View(nameof(Edit));
 
-            //var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _userManager.FindByIdAsync(model.Id);
 
-            return id;
+            var addToRoleResult = await _userManager.AddToRoleAsync(user, model.SelectedRole);
+            if (addToRoleResult.Succeeded)
+            {
+                ViewBag.Result = "User role added succesfully.";
+            }
+            else
+            {
+                ViewBag.Result = "Something went wrong.";
+            }
+
+            return RedirectToAction("Edit", new {id = model.Id});
         }
     }
 }
