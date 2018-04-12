@@ -6,9 +6,7 @@ namespace Library.Models
     {
         public int Id { get; set; }
         public DateTime DateOfBorrowing { get; set; }
-
-        //public User User { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
         public Copy Copy { get; set; }
-
     }
 }

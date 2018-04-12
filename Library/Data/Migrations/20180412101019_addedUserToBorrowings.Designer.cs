@@ -11,9 +11,10 @@ using System;
 namespace Library.Data.Migrations
 {
     [DbContext(typeof(LibraryContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180412101019_addedUserToBorrowings")]
+    partial class addedUserToBorrowings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

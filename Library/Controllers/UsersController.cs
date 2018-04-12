@@ -45,8 +45,6 @@ namespace Library.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            Debug.WriteLine("get edit");
-
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 

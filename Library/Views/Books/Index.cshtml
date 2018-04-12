@@ -40,6 +40,13 @@
             @Html.DisplayFor(modelItem => item.AvailableCount)
         </td>
         <td>
+            @if (item.AvailableCount > 0)
+            {
+                <form method="post">
+                    <input type="submit" asp-controller="Books" asp-action="Borrow" asp-route-id="@item.Book.Id" value="Borrow" class="btn btn-default" />
+                </form>
+            }
+
             @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
                 @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@

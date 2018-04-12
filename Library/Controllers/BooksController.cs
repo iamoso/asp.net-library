@@ -1,17 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Library.Data;
+using Library.Models;
 using Library.Models.BooksViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library.Controllers
 {
     public class BooksController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly LibraryContext _context;
 
-        public BooksController(LibraryContext context)
+        public BooksController(UserManager<ApplicationUser> userManager, LibraryContext context)
         {
+            _userManager = userManager;
             _context = context;
         }
 
@@ -36,6 +44,30 @@ namespace Library.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator, User")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Borrow(int id)
+        {
+            var copy = _context.Copies.FirstOrDefault(c => c.Book.Id == id && c.IsAvailable);
+
+            if (copy != null)
+            {
+                var borrowing = new Borrowing
+                {
+                    Copy = copy,
+                    DateOfBorrowing = DateTime.Today,
+                    ApplicationUser = await _userManager.GetUserAsync(User)
+                };
+
+                await _context.Borrowings.AddAsync(borrowing);
+                copy.IsAvailable = false;
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }
