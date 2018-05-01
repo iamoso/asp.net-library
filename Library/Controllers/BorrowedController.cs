@@ -8,6 +8,7 @@ using Library.Models.BorrowedViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.EntityFrameworkCore;
 
 namespace Library.Controllers
 {
@@ -25,7 +26,7 @@ namespace Library.Controllers
         public async Task<IActionResult> Index()
         {
             var model = new List<BorrowedViewModel>();
-            var borrowings = _context.Borrowings.ToList();
+            var borrowings = _context.Borrowings.Include(b => b.ApplicationUser).ToList();
             var userId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(userId);
 
