@@ -26,7 +26,7 @@ namespace Library.Controllers
         public async Task<IActionResult> Index()
         {
             var model = new List<BorrowedViewModel>();
-            var borrowings = _context.Borrowings.Include(b => b.ApplicationUser).ToList();
+            var borrowings = _context.Borrowings.Include(b => b.ApplicationUser).Include(b => b.Copy).Include(b => b.Copy.Book).ToList();
             var userId = _userManager.GetUserId(User);
             var user = await _userManager.FindByIdAsync(userId);
 
@@ -34,12 +34,10 @@ namespace Library.Controllers
             {
                 if (borrowing.ApplicationUser.Id == userId)
                 {
-                    var book = borrowing.Copy.Book;
-
                     model.Add(new BorrowedViewModel
                     {
                         Borrowing = borrowing,
-                        Book = book
+                        Book = borrowing.Copy.Book
                     });
                 }
             }
