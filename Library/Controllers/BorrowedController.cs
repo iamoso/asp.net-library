@@ -23,24 +23,20 @@ namespace Library.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var model = new List<BorrowedViewModel>();
-            var borrowings = _context.Borrowings.Include(b => b.ApplicationUser).Include(b => b.Copy).Include(b => b.Copy.Book).ToList();
             var userId = _userManager.GetUserId(User);
-            var user = await _userManager.FindByIdAsync(userId);
+            var borrowings = _context.Borrowings.Where(u => u.ApplicationUser.Id == userId)
+                .Include(b => b.Copy)
+                .Include(b => b.Copy.Book)
+                .ToList();
 
-            foreach (var borrowing in borrowings)
-            {
-                if (borrowing.ApplicationUser.Id == userId)
+            var model = borrowings.Select(borrowing => new BorrowedViewModel
                 {
-                    model.Add(new BorrowedViewModel
-                    {
-                        Borrowing = borrowing,
-                        Book = borrowing.Copy.Book
-                    });
-                }
-            }
+                    Borrowing = borrowing,
+                    Book = borrowing.Copy.Book
+                })
+                .ToList();
 
             return View(model);
         }
